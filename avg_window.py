@@ -20,8 +20,6 @@ for i in range(len(record_lines)):
     record_list.append(str(record_lines[i].strip()))
 print(record_list)
 
-pre_add = 1
-post_add = 0
 temp_sasg = []
 cnt_ecg = 0
 
@@ -46,16 +44,18 @@ for i in range(len(record_list)):
         
         if id == temp_rr[i]:
             print("SAME!")
-        
-        pre_add = int(temp_rr[i] - avge_result // 2)
-        post_add = int(avge_result // 2 + temp_rr[i])
+
         if id < 2:
             continue
-
+             
+        print(cnt_ecg, cnt_ecg + cnt_ecg)
         cnt_ecg += int(xqrs.rr_init)
-        temp_sasg = (temp_sg[cnt_ecg : 2 * cnt_ecg].tolist())
 
-        print(pre_add, post_add)
+        temp_sasg = (temp_sg[cnt_ecg : cnt_ecg * 2].tolist())
+        if id == 1:
+            temp_sasg = (temp_sg[0 : 
+                                 cnt_ecg].tolist())
+
         plt.plot(temp_sasg)
         plt.show()
     # plt.show()
