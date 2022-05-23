@@ -26,12 +26,13 @@ temp_sasg = []
 for i in range(len(record_list)):
     temp_avge_cnt = 0
     target_list = []
-    temp_path = R_PATH + record_list[i]
+    # temp_path = R_PATH + record_list[i]
+    temp_path = R_PATH + '100'
     temp_rr = (wp.ann2rr(temp_path, 'atr', as_array=True, start_time=0.0))
     temp_sg, _ = wfdb.rdsamp(temp_path, sampfrom=0)
     temp_cnt = -len(temp_rr)
 
-    for i in range(len(temp_rr)):
+    for id, i in enumerate(range(len(temp_rr))):
         avge_result = (temp_rr[temp_cnt] + temp_rr[(temp_cnt + 1)]) / 2     # Might be window size
         record_avge.append(avge_result)                                     # Save it...
         temp_cnt += 1                       
@@ -41,9 +42,13 @@ for i in range(len(record_list)):
         pre_add += int(temp_rr[i] - avge_result // 2)
         post_add += int(avge_result // 2 + temp_rr[i])
         
-        temp_sasg.append(temp_sg[pre_add:post_add].tolist())
-    plt.plot(temp_sasg[0])
-    plt.show()
+        if id < 2:
+            continue
+        
+        temp_sasg = (temp_sg[pre_add:post_add].tolist())
+        plt.plot(temp_sasg)
+        plt.show()
+    # plt.show()
         # print(temp_sasg.tolist(), "\n\n\n")
 
 # print(temp_rr.tolist())
