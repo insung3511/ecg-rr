@@ -23,6 +23,7 @@ for i in range(len(record_list)):
     target_list = []
     temp_path = R_PATH + record_list[i]
     temp_rr = (wp.ann2rr(temp_path, 'atr', as_array=True, start_time=0.0))
+    temp_sg, _ = wfdb.rdsamp(temp_path, sampfrom=0)
     temp_cnt = -len(temp_rr)
 
     for i in range(len(temp_rr)):
@@ -32,17 +33,24 @@ for i in range(len(record_list)):
             
         if longest <= avge_result:                                          # longest windows size selecting
             longest = avge_result
+        
+        temp_sg = temp_sg.tolist()
+        print(temp_sg[
+            avge_result // 2 - temp_rr[i] : avge_result // 2 + temp_rr[i]
+        ])
+# print(temp_rr.tolist())
 
-print("Longest strength : {},\tLongest Average : {}".format(longest, longest / 2))
+# print("Longest strength : {},\tLongest Average : {}".format(longest, longest / 2))
 
-for i in range(len(record_list)):
-    temp_path = R_PATH + record_list[i]
-    temp_list = wfdb.rdsamp(temp_path, sampfrom=0)
+# for i in range(len(record_list)):
+#     temp_path = R_PATH + record_list[i]
 
-    temp_rr = (wp.ann2rr(temp_path, 'atr', as_array=True, start_time=0.0))
+#     temp_list, _ = list(wfdb.rdsamp(temp_path, sampfrom=0))
+#     temp_rr = (wp.ann2rr(temp_path, 'atr', as_array=True, start_time=0.0)).tolist()
     
-    for i in range(len(temp_list)):
-        zero_padded_list = [
-            temp_list[temp_rr[i] - avge_result[i] : temp_rr[i] + avge_result[i]]
-        ]
-        print(zero_padded_list)
+#     for i in range(len(temp_list)):
+#         # zero_padded_list = [
+#         #     temp_list[temp_rr[i] - avge_result : temp_rr[i] + avge_result]
+#         # ]
+#         print(len(temp_list.tolist()), temp_rr[i])
+#         print(temp_list.tolist()[temp_rr[i]])
