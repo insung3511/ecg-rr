@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt 
 import wfdb.processing as wp
 import wfdb
 
@@ -17,6 +18,10 @@ for i in range(len(record_lines)):
     record_list.append(str(record_lines[i].strip()))
 print(record_list)
 
+pre_add = 1
+post_add = 0
+temp_sasg = []
+
 # R-R Interval
 for i in range(len(record_list)):
     temp_avge_cnt = 0
@@ -33,11 +38,14 @@ for i in range(len(record_list)):
             
         if longest <= avge_result:                                          # longest windows size selecting
             longest = avge_result
+        pre_add += int(temp_rr[i] - avge_result // 2)
+        post_add += int(avge_result // 2 + temp_rr[i])
         
-        temp_sg = temp_sg.tolist()
-        print(temp_sg[
-            avge_result // 2 - temp_rr[i] : avge_result // 2 + temp_rr[i]
-        ])
+        temp_sasg.append(temp_sg[pre_add:post_add].tolist())
+    plt.plot(temp_sasg[0])
+    plt.show()
+        # print(temp_sasg.tolist(), "\n\n\n")
+
 # print(temp_rr.tolist())
 
 # print("Longest strength : {},\tLongest Average : {}".format(longest, longest / 2))
