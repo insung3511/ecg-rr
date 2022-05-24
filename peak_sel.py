@@ -3,11 +3,12 @@ import numpy as np
 import pickle
 import wfdb
 
-R_PATH = "./data/cudb/"
-DB_NAME = "cudb"
+R_PATH = "./data/mit/"
+DB_NAME = "mit"
 exclude_record = ["bw", "em", "ma"]
 
 zero_padded_list = []
+dict_ann = []
 windowed_list = []
 record_list = []
 record_ann = []
@@ -35,8 +36,6 @@ for i in range(len(record_list)):
     longest = interval.max()
 print("LONGEST: ", longest)
 
-
-
 for i in range(len(record_list)):
     temp_rpath = R_PATH + record_list[i]
     temp_pickle = "./pickle/" + DB_NAME + record_list[i] + ".pkl"
@@ -46,6 +45,7 @@ for i in range(len(record_list)):
 
     # Got R-R Peak by rdann funciton
     record_ann = list(wfdb.rdann(temp_rpath, 'atr', sampfrom=0).sample)[1:]
+    record_ann_sym = list(wfdb.rdann(temp_rpath, 'atr', sampfrom=0).symbol)[1:]
 
     for i in range(len(record_ann)):
         try:
@@ -65,15 +65,14 @@ for i in range(len(record_list)):
         windowed_list = flatter(record_sg[cut_pre_add:cut_post_add])
         # print(windowed_list)
 
-        zero_padded_list = (
-            (
-                np.pad( windowed_list, 
-                        int(longest - len(windowed_list) / 4), 
-                        'constant', 
-                        constant_values=0)
-            ).tolist()
-        )
+        zero_padded_list.append(np.pad(windowed_list, int((longest - len(windowed_list)) / 2), 'constant', constant_values=0))
+        dict_ann.append(record_ann_sym[i])
 
-        with open(temp_pickle, "wb") as f:
-            pickle.dump(zero_padded_list, f)
+    ann_dict = {
+        0 : zero_padded_list,
+        1 : dict_ann
+    }
+
+    with open(temp_pickle, "wb") as f:
+        pickle.dump(ann_dict, f)
     print(temp_pickle, " SAVED!")
