@@ -5,6 +5,7 @@ import wfdb.processing as wp
 import wfdb
 
 R_PATH = "./data/nstdb/"
+exclude_record = ['bw', 'em', 'ma']
 
 zero_padded_list = []
 record_list = []
@@ -27,37 +28,37 @@ cnt_ecg = 0
 for i in range(len(record_list)):
     temp_avge_cnt = 0
     target_list = []
+    left_size, right_size = 0, 0
+
+    if record_list[i] in exclude_record:
+        continue
 
     temp_path = R_PATH + record_list[i]
     temp_rr = (wp.ann2rr(temp_path, 'atr', as_array=True, start_time=0.0))
-
     temp_sg, temp_fs = wfdb.rdsamp(temp_path, sampfrom=0)
-    xqrs = wp.XQRS(sig=temp_sg[:, 0], fs=temp_fs['fs'])
-    xqrs.detect()
-    
     temp_cnt = -len(temp_rr)
 
     for id, i in enumerate(range(len(temp_rr))):  # Might be window size
-        avge_result = (temp_rr[temp_cnt + 1] + temp_rr[(temp_cnt + 2)]) / 2   
-        record_avge.append(avge_result)                                     # Save it...
-        temp_cnt += 1                       
+        left_size += temp_rr[id]
+        right_size += temp_rr[id + 1]
+        print(left_size, right_size)
+
+        plt.plot(temp_sg[left_size:right_size])
+        plt.show()
+
+        # record_avge.append(avge_result)                                     # Save it...
+        # temp_cnt += 1                       
         
         if id == temp_rr[i]:
             print("SAME!")
 
-        if id < 2:
-            continue
-             
-        print(cnt_ecg, cnt_ecg + cnt_ecg)
-        cnt_ecg += int(xqrs.rr_init)
+        # temp_sasg = (temp_sg[cnt_ecg : cnt_ecg * 2].tolist())
+        # if id == 1:
+        #     temp_sasg = (temp_sg[0 : 
+        #                          cnt_ecg].tolist())
 
-        temp_sasg = (temp_sg[cnt_ecg : cnt_ecg * 2].tolist())
-        if id == 1:
-            temp_sasg = (temp_sg[0 : 
-                                 cnt_ecg].tolist())
-
-        plt.plot(temp_sasg)
-        plt.show()
+        # plt.plot(temp_sasg)
+        # plt.show()
     # plt.show()
         # print(temp_sasg.tolist(), "\n\n\n")
 

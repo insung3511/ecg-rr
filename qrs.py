@@ -1,5 +1,3 @@
-from ast import AnnAssign
-from re import L
 import matplotlib.pyplot as plt
 import wfdb.processing as wp
 import wfdb
@@ -21,16 +19,10 @@ for i in range(len(record_lines)):
 print(record_list)
 
 for i in range(len(record_lines)):
-    r_path = PATH + record_lines[i]
-    sig, fields = wfdb.rdsamp(r_path)
-    rrin = wp.ann2rr(r_path, 'atr', as_array=True, start_time=0.0)
-    xqrs = wp.XQRS(sig=sig[:, 0], fs=fields['fs'])
-    
-    xqrs.detect()
-    print(sig, rrin)
-
-pre_rrin_temp = 0
-post_rrin_temp = 0
+    if record_lines[i] == exclude_record[i]:
+        pass
+    rpath = PATH + record_lines[i]
+    wp.ann2rr(rpath, 'atr', start_time=0)
 
 # for i in range(len(sig)):
 #     post_rrin_temp += rrin[i]
