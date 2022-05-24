@@ -4,7 +4,7 @@ from sympy import Q
 import wfdb.processing as wp
 import wfdb
 
-R_PATH = "./data/nstdb/"
+R_PATH = "./data/mit/"
 exclude_record = ['bw', 'em', 'ma']
 
 zero_padded_list = []
@@ -35,46 +35,23 @@ for i in range(len(record_list)):
 
     temp_path = R_PATH + record_list[i]
     temp_rr = (wp.ann2rr(temp_path, 'atr', as_array=True, start_time=0.0))
-    temp_sg, temp_fs = wfdb.rdsamp(temp_path, sampfrom=0)
-    temp_cnt = -len(temp_rr)
+    print(temp_rr.tolist())
+    temp_sg, temp_fs = wfdb.rdsamp(temp_path, channels=[0, 1], sampfrom=0)
 
     for id, i in enumerate(range(len(temp_rr))):  # Might be window size
-        left_size += temp_rr[id]
-        right_size += temp_rr[id + 1]
+        try:
+            left_size += temp_rr[id]
+            right_size += temp_rr[id + 1]
+        except IndexError:
+            pass
+
+        diff_len = right_size - left_size
         print(left_size, right_size)
 
-        plt.plot(temp_sg[left_size:right_size])
+        plt.figure(figsize=(15, 4))
+        plt.plot(temp_sg)
+        plt.plot(temp_sg[left_size+left_size:right_size+right_size])
         plt.show()
-
-        # record_avge.append(avge_result)                                     # Save it...
-        # temp_cnt += 1                       
         
         if id == temp_rr[i]:
             print("SAME!")
-
-        # temp_sasg = (temp_sg[cnt_ecg : cnt_ecg * 2].tolist())
-        # if id == 1:
-        #     temp_sasg = (temp_sg[0 : 
-        #                          cnt_ecg].tolist())
-
-        # plt.plot(temp_sasg)
-        # plt.show()
-    # plt.show()
-        # print(temp_sasg.tolist(), "\n\n\n")
-
-# print(temp_rr.tolist())
-
-# print("Longest strength : {},\tLongest Average : {}".format(longest, longest / 2))
-
-# for i in range(len(record_list)):
-#     temp_path = R_PATH + record_list[i]
-
-#     temp_list, _ = list(wfdb.rdsamp(temp_path, sampfrom=0))
-#     temp_rr = (wp.ann2rr(temp_path, 'atr', as_array=True, start_time=0.0)).tolist()
-    
-#     for i in range(len(temp_list)):
-#         # zero_padded_list = [
-#         #     temp_list[temp_rr[i] - avge_result : temp_rr[i] + avge_result]
-#         # ]
-#         print(len(temp_list.tolist()), temp_rr[i])
-#         print(temp_list.tolist()[temp_rr[i]])
