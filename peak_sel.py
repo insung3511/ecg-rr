@@ -22,7 +22,6 @@ for k in range(len(DB_PATH)):
 
     exclude_record = ["bw", "em", "ma"]
 
-    zero_padded_list = []
     dict_ann = []
     windowed_list = []
     record_list = []
@@ -47,6 +46,8 @@ for k in range(len(DB_PATH)):
     print("LONGEST: ", longest)
 
     for j in range(len(record_list)):
+        zero_padded_list = []
+        dict_ann = []
         temp_rpath = R_PATH + record_list[j]
         temp_pickle = PICKLE_PATH + DB_PATH[k] + record_list[j] + ".pkl"
 
@@ -73,15 +74,6 @@ for k in range(len(DB_PATH)):
             if i < 1:
                 continue
             
-            windowed_list = flatter(record_sg[cut_pre_add:cut_post_add])
-            if len(windowed_list) > 428:
-                cut_it_off = 0
-            else:
-                cut_it_off = int((428 - len(windowed_list)) / 2)
-
-            if len(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0)) == 427:
-                zero_padded_list.append(np.append([0.0], np.pad(windowed_list, cut_it_off , 'constant', constant_values=0)))
-            
             check_ann = record_ann_sym[i]
             if check_ann in NORAML_ANN:
                 record_ann_sym[i] = "N"
@@ -94,8 +86,18 @@ for k in range(len(DB_PATH)):
             elif check_ann in UNCLASS_ANN:
                 record_ann_sym[i] = "Q"
             else:
-                record_ann_sym[i] = "?"
-            
+                continue
+
+            windowed_list = flatter(record_sg[cut_pre_add:cut_post_add])
+            if len(windowed_list) > 428:
+                cut_it_off = 0
+
+            else:
+                cut_it_off = int((428 - len(windowed_list)) / 2)
+
+            if len(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0)) == 427:
+                zero_padded_list.append(np.append([0.0], np.pad(windowed_list, cut_it_off , 'constant', constant_values=0)))
+        
             # plt.plot(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0))
             # plt.title(record_ann_sym[i])
             # plt.show()
