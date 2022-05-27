@@ -4,3 +4,4 @@ data/esc filter=lfs diff=lfs merge=lfs -text
 data/mit filter=lfs diff=lfs merge=lfs -text
 data/nstdb filter=lfs diff=lfs merge=lfs -text
 pickle/nst119e_6.pkl filter=lfs diff=lfs merge=lfs -text
+pickle/
