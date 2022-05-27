@@ -60,19 +60,18 @@ for k in range(len(DB_PATH)):
 
         interval = wp.ann2rr(temp_rpath, 'atr', as_array=True)
         
-        for i in range(len(record_ann)):
+        for i in range(len(record_ann)):            
             try:
                 pre_add = record_ann[i - 1]
                 post_add = record_ann[i + 1]
             except IndexError:
-                break
+                pre_add = record_ann[i - 1]
+                post_add = record_ann[-1]
+                # s
 
-            avg_div = (interval[i - 1] + interval[i]) / 2
-            cut_pre_add = record_ann[i] - int((record_ann[i] - pre_add) / 2) 
-            cut_post_add = record_ann[i] + int((post_add - record_ann[i]) / 2)
-
-            if i < 1:
-                continue
+            avg_div = (interval[i - 1] + interval[i]) / 2 
+            cut_pre_add = record_ann[i] - int((record_ann[i] - pre_add) / 2)
+            cut_post_add = record_ann[i] + int((post_add - record_ann[i]) / 2) 
             
             check_ann = record_ann_sym[i]
             if check_ann in NORAML_ANN:
@@ -86,10 +85,10 @@ for k in range(len(DB_PATH)):
             elif check_ann in UNCLASS_ANN:
                 record_ann_sym[i] = "Q"
             else:
-                continue
-
+                record_ann_sym[i] = " "
+            
             windowed_list = flatter(record_sg[cut_pre_add:cut_post_add])
-            if len(windowed_list) > 428:
+            if len(windowed_list) > 428: 
                 cut_it_off = 0
 
             else:
@@ -97,12 +96,15 @@ for k in range(len(DB_PATH)):
 
             if len(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0)) == 427:
                 zero_padded_list.append(np.append([0.0], np.pad(windowed_list, cut_it_off , 'constant', constant_values=0)))
+            else:
+                zero_padded_list.append(np.pad(windowed_list, cut_it_off , 'constant', constant_values=0))
         
             # plt.plot(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0))
             # plt.title(record_ann_sym[i])
             # plt.show()
-
+            
             dict_ann.append(record_ann_sym[i])
+        print(len(zero_padded_list), len(record_ann_sym))
 
         ann_dict = {
             0 : zero_padded_list,
