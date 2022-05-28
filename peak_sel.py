@@ -6,16 +6,22 @@ import numpy as np
 import pickle
 import wfdb
 
-PICKLE_PATH = "./pickle_May27_2022_15_16/"
+PICKLE_PATH = "./pickle/"
 DEFAULT_PATH = "./data/"
-DB_PATH = ['mit', 'nstdb']
+DB_PATH = ['mit']
 EXTRA_NP = np.array(0)
+
+EXCLUDE_RECORD_MIT = [106, 108, 113, 114, 115, 117, 119, 121, 123, 124, 201, 202, 203, 207, 208, 210, 214, 219, 221, 222, 228, 232]
 
 NORAML_ANN = ['N', 'L', 'R', 'e', 'j']
 SUPRA_ANN = ['A', 'a', 'J', 'S']
 VENTRI_ANN = ['V', 'E']
 FUSION_ANN = ['F']
 UNCLASS_ANN = ['/', 'f', 'Q']
+
+def flatter(list_of_list):
+    flatList = [ item for elem in list_of_list for item in elem]
+    return flatList
 
 for k in range(len(DB_PATH)):
     R_PATH = DEFAULT_PATH + DB_PATH[k] + "/"
@@ -28,10 +34,6 @@ for k in range(len(DB_PATH)):
     record_ann = []
     longest = 0.
 
-    def flatter(list_of_list):
-        flatList = [ item for elem in list_of_list for item in elem]
-        return flatList
-
     # Read RECORDS txt file
     print("[INFO] Read records file from ", R_PATH)
     with open(R_PATH + 'RECORDS') as f:
@@ -43,7 +45,6 @@ for k in range(len(DB_PATH)):
             continue
         record_list.append(str(record_lines[i].strip()))
 
-    print("LONGEST: ", longest)
 
     for j in range(len(record_list)):
         zero_padded_list = []
@@ -67,7 +68,6 @@ for k in range(len(DB_PATH)):
             except IndexError:
                 pre_add = record_ann[i - 1]
                 post_add = record_ann[-1]
-                # s
 
             avg_div = (interval[i - 1] + interval[i]) / 2 
             cut_pre_add = record_ann[i] - int((record_ann[i] - pre_add) / 2)
@@ -88,23 +88,30 @@ for k in range(len(DB_PATH)):
                 record_ann_sym[i] = " "
             
             windowed_list = flatter(record_sg[cut_pre_add:cut_post_add])
+            cut_it_off = int((428 - len(windowed_list)) / 2)
+
             if len(windowed_list) > 428: 
                 cut_it_off = 0
-
+                cut_pre_add = record_ann[i] - int(428 / 2)
+                cut_post_add = record_ann[i] + int(428 / 2) 
+                windowed_list = flatter(record_sg[cut_pre_add:cut_post_add])
+                zero_padded_list.append(windowed_list)
+                
             else:
                 cut_it_off = int((428 - len(windowed_list)) / 2)
+                # print(record_list[j], "Else! -> ", len(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0)))
 
-            if len(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0)) == 427:
-                zero_padded_list.append(np.append([0.0], np.pad(windowed_list, cut_it_off , 'constant', constant_values=0)))
-            else:
-                zero_padded_list.append(np.pad(windowed_list, cut_it_off , 'constant', constant_values=0))
-        
+                if len(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0)) == 427:
+                    zero_padded_list.append(np.append([0.0], np.pad(windowed_list, cut_it_off , 'constant', constant_values=0)))
+                else:
+                    zero_padded_list.append(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0))
+            
+            # plt.figure(figsize=(15, 10))
             # plt.plot(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0))
             # plt.title(record_ann_sym[i])
             # plt.show()
             
             dict_ann.append(record_ann_sym[i])
-        print(len(zero_padded_list), len(record_ann_sym))
 
         ann_dict = {
             0 : zero_padded_list,
