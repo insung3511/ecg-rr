@@ -13,8 +13,6 @@ R-R Interval 을 기점으로 비트를 잘라내는 프로젝트이다. 이론�
 for i in range(len(record_list)):
     temp_rpath = R_PATH + record_list[i]
     interval = wp.ann2rr(temp_rpath, 'atr', as_array=True)
-    longest = interval.max()
-print("LONGEST: ", longest)
 ```
 
 record_list는 읽어올 record의 파일명, temp_rpath는 지속적으로 변경될 path를 지정해준다. 정해진 path로 wp (wfdb.processing module) 의 ann2rr 를 통해 R Peak의 길이를 갖고온다. 그 중에서 가장 긴 길이를 찾아내어 longest로 지정. 
@@ -22,26 +20,49 @@ record_list는 읽어올 record의 파일명, temp_rpath는 지속적으로 변�
 ### Cutting it
 
 ```python
-for i in range(len(record_ann)):
-    try:
-        pre_add = record_ann[i - 1]
-        post_add = record_ann[i + 1]
+for i in range(len(record_ann)):            
+            try:
+                pre_add = record_ann[i - 1]
+                post_add = record_ann[i + 1]
+            except IndexError:
+                pre_add = record_ann[i - 1]
+                post_add = record_ann[-1]
 
-    except IndexError:
-        break
+            avg_div = (interval[i - 1] + interval[i]) / 2 
+            cut_pre_add = record_ann[i] - int((record_ann[i] - pre_add) / 2)
+            cut_post_add = record_ann[i] + int((post_add - record_ann[i]) / 2) 
+            
+            check_ann = record_ann_sym[i]
+            if check_ann in NORAML_ANN:
+                record_ann_sym[i] = "N"
+            elif check_ann in SUPRA_ANN:
+                record_ann_sym[i] = "S"
+            elif check_ann in VENTRI_ANN:
+                record_ann_sym[i] = "V"
+            elif check_ann in FUSION_ANN:
+                record_ann_sym[i] = "F"
+            elif check_ann in UNCLASS_ANN:
+                record_ann_sym[i] = "Q"
+            else:
+                record_ann_sym[i] = " "
+            
+            windowed_list = flatter(record_sg[cut_pre_add:cut_post_add])
+            cut_it_off = int((428 - len(windowed_list)) / 2)
 
-    cut_pre_add = record_ann[i] - int((record_ann[i] - pre_add) / 2) 
-    cut_post_add = record_ann[i] + int((post_add - record_ann[i]) / 2
-    
-    if i < 1:
-        continue
-    
-    windowed_list = flatter(record_sg[cut_pre_add:cut_post_add]
-    zero_padded_list.append(np.pad(windowed_list, int(longest/ 2), 'constant', constant_values=0))
-    dict_ann.append(record_ann_sym[i]
-    
-    if record_ann_sym[i] != "N":
-        print("Abnormal!", temp_rpath, "\t|\t", record_ann_sym[i]
+            if len(windowed_list) > 428: 
+                cut_it_off = 0
+                cut_pre_add = record_ann[i] - int(428 / 2)
+                cut_post_add = record_ann[i] + int(428 / 2) 
+                windowed_list = flatter(record_sg[cut_pre_add:cut_post_add])
+                zero_padded_list.append(windowed_list)
+                
+            else:
+                cut_it_off = int((428 - len(windowed_list)) / 2)
+
+                if len(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0)) == 427:
+                    zero_padded_list.append(np.append([0.0], np.pad(windowed_list, cut_it_off , 'constant', constant_values=0)))
+                else:
+                    zero_padded_list.append(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0))
 ```
 
 이제 비트에서 잘라내는 과정이다. pre_add, post_add는 current 비트 기준 앞 뒤, 비트이고 cut_pre_add와 cut_post_add 는 이제 자를 비트의 위치이다.

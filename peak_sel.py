@@ -1,5 +1,3 @@
-from tabnanny import check
-from attr import field
 import matplotlib.pyplot as plt
 import wfdb.processing as wp
 import numpy as np
@@ -99,7 +97,6 @@ for k in range(len(DB_PATH)):
                 
             else:
                 cut_it_off = int((428 - len(windowed_list)) / 2)
-                # print(record_list[j], "Else! -> ", len(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0)))
 
                 if len(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0)) == 427:
                     zero_padded_list.append(np.append([0.0], np.pad(windowed_list, cut_it_off , 'constant', constant_values=0)))
