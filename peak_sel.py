@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import wfdb.processing as wp
 import numpy as np
 import pickle
@@ -8,8 +7,6 @@ PICKLE_PATH = "./pickle/"
 DEFAULT_PATH = "./data/"
 DB_PATH = ['mit']
 EXTRA_NP = np.array(0)
-
-EXCLUDE_RECORD_MIT = [106, 108, 113, 114, 115, 117, 119, 121, 123, 124, 201, 202, 203, 207, 208, 210, 214, 219, 221, 222, 228, 232]
 
 NORAML_ANN = ['N', 'L', 'R', 'e', 'j']
 SUPRA_ANN = ['A', 'a', 'J', 'S']
@@ -102,12 +99,7 @@ for k in range(len(DB_PATH)):
                     zero_padded_list.append(np.append([0.0], np.pad(windowed_list, cut_it_off , 'constant', constant_values=0)))
                 else:
                     zero_padded_list.append(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0))
-            
-            # plt.figure(figsize=(15, 10))
-            # plt.plot(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0))
-            # plt.title(record_ann_sym[i])
-            # plt.show()
-            
+              
             dict_ann.append(record_ann_sym[i])
 
         ann_dict = {
