@@ -1,7 +1,4 @@
 from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
-from sympy import false
-from torch import norm
 from tqdm import tqdm
 import numpy as np
 import random
@@ -127,8 +124,9 @@ print("[SIZE]\t\tTrain Unclassed Beat Signal : {}\n\t\tTrain Unclassed Annotatio
 print("[SIZE]\t\tTest Unclassed Beat Signal : {}\n\t\tTest Unclassed Annotation : {}".format(X_test_unclass.shape, y_test_unclass.shape))
 
 # Up-sizing S class
+print("= " * 35)
 print("\n"*3)
-
+print("[INFO] Supra-Venticular classes starting \"Rebalancing\"...")
 sizing_s_class_sig = list()
 sizing_s_class_ann = list()
 
@@ -142,7 +140,7 @@ print("[SIZE]\t\tRe-balanced Supra-ventricular Beat Signal : {}\n\t\tRe-balanced
 
 # Up-sizing F class
 print("\n"*3)
-
+print("[INFO] False alarm classes starting \"Rebalancing\"...")
 sizing_f_class_sig = list()
 sizing_f_class_ann = list()
 
@@ -153,3 +151,8 @@ for idx in tqdm(range(8000)):
 sizing_f_class_sig = np.array(sizing_f_class_sig)
 sizing_f_class_ann = np.array(sizing_f_class_ann)
 print("[SIZE]\t\tRe-balanced False Beat Signal : {}\n\t\tRe-balanced False Annotation : {}".format(sizing_f_class_sig.shape, sizing_f_class_ann.shape))
+
+# print("\a\n[INFO] Start saving rebalanced data as pickle file.")
+# whole_sig = list()
+# whole_ann = list()
+# dict_ann = dict()
