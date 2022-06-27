@@ -18,6 +18,17 @@ VENTRI_ANN = ['V', 'E']
 FUSION_ANN = ['F']
 UNCLASS_ANN = ['/', 'f', 'Q']
 
+def zero_sum (input_list):
+    result = 0
+    for val in input_list:
+        result += val
+    
+    if result == 0:
+        return result
+
+    else:
+        return 1
+
 def flatter(list_of_list):
     flatList = [ item for elem in list_of_list for item in elem]
     return flatList
@@ -33,7 +44,6 @@ for k in range(len(DB_PATH)):
     longest = 0.
 
     record_mat = io.loadmat(DEFAULT_PATH)
-    print(record_mat)
 
     record_mat_keys = list(record_mat.keys())
     record_mat_keys = record_mat_keys[3:]
@@ -82,6 +92,9 @@ for k in range(len(DB_PATH)):
                 continue
             
             windowed_list = flatter(record_sg[cut_pre_add:cut_post_add])
+            if zero_sum(windowed_list) == 0:
+                continue
+
             cut_it_off = int((428 - len(windowed_list)) / 2)
 
             if len(windowed_list) > 428: 
@@ -99,8 +112,8 @@ for k in range(len(DB_PATH)):
                 else:
                     zero_padded_list.append(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0))
             
-            plt.plot(zero_padded_list[-1])
-            plt.show()
+            # plt.plot(zero_padded_list[-1])
+            # plt.show()
             dict_ann.append(record_ann_sym[i])
 
         ann_dict = {
@@ -111,3 +124,53 @@ for k in range(len(DB_PATH)):
         with open(temp_pickle, "wb") as f:
             pickle.dump(ann_dict, f)
         # print(temp_pickle, " SAVED!")
+
+# Checking code
+DATA_PATH = "./pickle_mat/"
+
+record_list = []
+pickle_input = dict()
+X, y = [], []
+
+print("[INFO] Read records file from ", DATA_PATH)
+with open(DATA_PATH + 'RECORDS') as f:
+    record_lines = f.readlines()
+
+for i in range(len(record_lines)):
+    record_list.append(str(record_lines[i].strip()))
+
+for i in tqdm(range(len(record_list))):
+    temp_path = DATA_PATH + "mitPssigP_" + record_list[i] + ".pkl"
+    with open(temp_path, 'rb') as f:
+        pickle_input = pickle.load(f)
+        for i in range(len(pickle_input[0])):
+            X.append(pickle_input[0][i])
+
+        for i in range(len(pickle_input[1])):
+            check_ann = pickle_input[1][i]
+            temp_ann_list = list()
+            if check_ann == "N":            # Normal
+                temp_ann_list.append(0)
+
+            elif check_ann == "S":          # Supra-ventricular
+                temp_ann_list.append(1)
+
+            elif check_ann == "V":          # Ventricular
+                temp_ann_list.append(2)
+
+            elif check_ann == "F":          # False alarm
+                temp_ann_list.append(3)
+
+            elif check_ann == "Q":          # Unclassed 
+                temp_ann_list.append(4)
+            
+            else:
+                temp_ann_list.append(9)
+            y.append(temp_ann_list)
+
+X = np.array(X)
+y = np.array(y)
+
+print(np.unique(y))
+print(X.shape)
+print(y.shape)

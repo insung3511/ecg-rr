@@ -23,10 +23,6 @@ for i in tqdm(range(len(record_list))):
         pickle_input = pickle.load(f)
         for i in range(len(pickle_input[0])):
             X.append(pickle_input[0][i])
-   
-        plt.plot(pickle_input[0][i])
-        plt.title(pickle_input[1][i])
-        plt.show()
 
         for i in range(len(pickle_input[1])):
             check_ann = pickle_input[1][i]
