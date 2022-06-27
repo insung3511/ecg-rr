@@ -3,8 +3,7 @@ from tqdm import tqdm
 import numpy as np
 import random
 import pickle
-
-from class_check import DATA_PATH
+import os
 
 DATA_PATH = "./pickle_mat/"
 TEST_SIZE = 0.3
@@ -152,7 +151,47 @@ sizing_f_class_sig = np.array(sizing_f_class_sig)
 sizing_f_class_ann = np.array(sizing_f_class_ann)
 print("[SIZE]\t\tRe-balanced False Beat Signal : {}\n\t\tRe-balanced False Annotation : {}".format(sizing_f_class_sig.shape, sizing_f_class_ann.shape))
 
-# print("\a\n[INFO] Start saving rebalanced data as pickle file.")
-# whole_sig = list()
-# whole_ann = list()
-# dict_ann = dict()
+print("\a\n[INFO] Start saving rebalanced data as pickle file.")
+whole_sig = list()
+whole_ann = list()
+dict_ann = {
+    "X_train" : list(),
+    "y_train" : list(),
+    "X_test" : list(),
+    "y_test" : list()
+}
+
+dict_ann["X_train"].append(X_train_normal)
+dict_ann["X_train"].append(sizing_s_class_sig)
+dict_ann["X_train"].append(X_train_ven)
+dict_ann["X_train"].append(sizing_f_class_sig)
+dict_ann["X_train"].append(X_train_unclass)
+
+dict_ann["y_train"].append(y_train_normal)
+dict_ann["y_train"].append(sizing_s_class_ann)
+dict_ann["y_train"].append(y_train_ven)
+dict_ann["y_train"].append(sizing_f_class_ann)
+dict_ann["y_train"].append(y_train_unclass)
+
+dict_ann["X_test"].append(X_test_normal)
+dict_ann["X_test"].append(X_test_supra)
+dict_ann["X_test"].append(X_test_ven)
+dict_ann["X_test"].append(X_test_false)
+dict_ann["X_test"].append(X_test_unclass)
+
+dict_ann["y_test"].append(y_test_normal)
+dict_ann["y_test"].append(y_test_supra)
+dict_ann["y_test"].append(y_test_ven)
+dict_ann["y_test"].append(y_test_false)
+dict_ann["y_test"].append(y_test_unclass)
+
+save_pickle_name = "rebalanced_pickle.pkl"
+with open(save_pickle_name, "wb") as f:
+    pickle.dump(dict_ann, f)
+
+check_file_list = os.listdir('.')
+if save_pickle_name in check_file_list:
+    print("[SAVE] Saved! Program done.")
+
+else:
+    print("[SAVE] Failed to saved! Program is off.")
