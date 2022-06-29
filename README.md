@@ -28,7 +28,7 @@ record_list는 읽어올 record의 파일명, temp_rpath는 지속적으로 변�
 ### Cutting it
 
 ```python
-for i in range(len(record_ann)):            
+        for i in range(len(record_ann)):            
             try:
                 pre_add = record_ann[i - 1]
                 post_add = record_ann[i + 1]

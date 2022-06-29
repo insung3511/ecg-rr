@@ -9,11 +9,15 @@ import random
 import pickle
 import os
 
-rList = ["100", "101", "102", "103", "104", "105", "106", "107", "108", "109",
-         "111", "112", "113", "114", "115", "116", "117", "118", "119", "121",
-         "122", "123", "124", "200", "201", "202", "203", "205", "207", "208",
-         "209", "210", "212", "213", "214", "215", "217", "219", "220", "221",
-         "222", "223", "228", "230", "231", "232", "233", "234"]
+DATA_PATH = "./pickle_mat/"
+print("[INFO] Read records file from ", DATA_PATH)
+with open(DATA_PATH + 'RECORDS') as f:
+    record_lines = f.readlines()
+
+rList = []
+for i in range(len(record_lines)):
+    rList.append(str(record_lines[i].strip()))
+
 path = './pickle_mat/'
 pickle_input = dict()
 X, y = [], []
@@ -87,10 +91,13 @@ annF_ran.append(random.choices(Ytr_F, k=8000))
 
 Xtr_S = np.array(sigS_ran)
 Xtr_S = Xtr_S[0][:][:]
+
 Ytr_S = np.array(annS_ran)
 Ytr_S = Ytr_S[0][:][:]
+
 Xtr_F = np.array(sigF_ran)
 Xtr_F = Xtr_F[0][:][:]
+
 Ytr_F = np.array(annF_ran)
 Ytr_F = Xtr_F[0][:][:]
 
@@ -130,12 +137,16 @@ Ytr = pd.DataFrame(data=Ytr)
 
 for i in range(0,3000):
     Yte.append(0)
+
 for i in range(0,835):
     Yte.append(1) 
+
 for i in range(0,2171):
     Yte.append(2)
+
 for i in range(0,241):
     Yte.append(3)
+
 for i in range(0,2412):
     Yte.append(4)
 
