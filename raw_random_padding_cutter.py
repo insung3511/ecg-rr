@@ -3,20 +3,13 @@
 
 import matplotlib.pyplot as plt
 import wfdb.processing as wp
-<<<<<<< HEAD
-=======
 from tqdm import tqdm
->>>>>>> ae1200ec8a7dfe76f7d5b432d679e7441496d2d7
 import numpy as np
 import random
 import pickle
 import wfdb
 
-<<<<<<< HEAD
-PICKLE_PATH = "./pickle/"
-=======
 PICKLE_PATH = "./pickle_rand/"
->>>>>>> ae1200ec8a7dfe76f7d5b432d679e7441496d2d7
 DEFAULT_PATH = "./data/"
 DB_PATH = ['mit']
 EXTRA_NP = np.array(0)
@@ -27,11 +20,8 @@ VENTRI_ANN = ['V', 'E']
 FUSION_ANN = ['F']
 UNCLASS_ANN = ['/', 'f', 'Q']
 
-<<<<<<< HEAD
-=======
 np.random.seed(42)
 
->>>>>>> ae1200ec8a7dfe76f7d5b432d679e7441496d2d7
 def flatter(list_of_list):
     flatList = [ item for elem in list_of_list for item in elem]
     return flatList
@@ -59,11 +49,7 @@ for k in range(len(DB_PATH)):
         record_list.append(str(record_lines[i].strip()))
 
 
-<<<<<<< HEAD
-    for j in range(len(record_list)):
-=======
     for j in tqdm(range(len(record_list))):
->>>>>>> ae1200ec8a7dfe76f7d5b432d679e7441496d2d7
         zero_padded_list = []
         dict_ann = []
         temp_rpath = R_PATH + record_list[j]
@@ -92,12 +78,8 @@ for k in range(len(DB_PATH)):
             elif check_ann in UNCLASS_ANN:
                 record_ann_sym[i] = "Q"
             else:
-<<<<<<< HEAD
-                record_ann_sym[i] = " "
-=======
                 continue
->>>>>>> ae1200ec8a7dfe76f7d5b432d679e7441496d2d7
-            
+                
             # Cutting beat part
             try:
                 pre_add = record_ann[i - 1]
@@ -114,39 +96,15 @@ for k in range(len(DB_PATH)):
             windowed_list = flatter(record_sg[cut_pre_add:cut_post_add])
             cut_it_off = int((428 - len(windowed_list)) / 2)
 
-<<<<<<< HEAD
-=======
             if np.sum(windowed_list) == 0:
                 continue
 
->>>>>>> ae1200ec8a7dfe76f7d5b432d679e7441496d2d7
             if len(windowed_list) > 428: 
                 cut_it_off = 0
                 
                 cut_pre_add = record_ann[i] - int(428 / 2)
                 cut_post_add = record_ann[i] + int(428 / 2) 
                 
-<<<<<<< HEAD
-                print(cut_pre_add, cut_post_add)
-                
-                windowed_list = flatter(record_sg[cut_pre_add:cut_post_add])
-                zero_padded_list.append(windowed_list)
-                
-            else:
-                cut_it_off = int((428 - len(windowed_list)) / 2)
-                np.random.seed(42)
-
-                random_pre_add = np.random.randint(0, 429 - len(windowed_list))
-                random_post_add = int(random_pre_add + len(windowed_list))
-
-                print(random_pre_add, random_post_add)
-                zero_padded_list.append(np.append([0.0], np.pad(windowed_list, (random_pre_add, random_post_add) , 'constant', constant_values=0)))
-                    
-            plt.title(record_ann_sym[i])
-            plt.plot(zero_padded_list[-1])
-            plt.show()
-
-=======
                 windowed_list = flatter(record_sg[cut_pre_add:cut_post_add])
                 
             else:
@@ -161,7 +119,6 @@ for k in range(len(DB_PATH)):
                 windowed_list = np.append([0.0], np.pad(windowed_list, (random_pre_add, random_post_add) , 'constant', constant_values=0))
             
             zero_padded_list.append(windowed_list[:428])
->>>>>>> ae1200ec8a7dfe76f7d5b432d679e7441496d2d7
             dict_ann.append(record_ann_sym[i])
 
         ann_dict = {
@@ -170,9 +127,4 @@ for k in range(len(DB_PATH)):
         }
 
         with open(temp_pickle, "wb") as f:
-<<<<<<< HEAD
             pickle.dump(ann_dict, f)
-        print(temp_pickle, " SAVED!")
-=======
-            pickle.dump(ann_dict, f)
->>>>>>> ae1200ec8a7dfe76f7d5b432d679e7441496d2d7
