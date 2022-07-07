@@ -61,7 +61,8 @@ for k in range(len(DB_PATH)):
 
         # Got R-R Peak by rdann funciton
         record_ann = list(wfdb.rdann(temp_rpath, "atr", sampfrom=0).sample)[1:]
-        record_ann_sym = list(wfdb.rdann(temp_rpath, "atr", sampfrom=0).symbol)[1:]
+        record_ann_sym = list(
+            wfdb.rdann(temp_rpath, "atr", sampfrom=0).symbol)[1:]
 
         interval = wp.ann2rr(temp_rpath, "atr", as_array=True)
 
