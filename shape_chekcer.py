@@ -80,12 +80,13 @@ print("[SIZE]\t\tX_validation length : {}\n\t\ty_validation length : {}".format(
 print("[SIZE]\t\tX_test length : {}\n\t\ty_test length : {}".format(npx_test.shape, npy_test.shape))
 
 # 랜덤으로 뽑아서 뿌려보기
-random.seed(50)
+random.seed(64)
 
 plt.figure(figsize=(30, 12))
 plt.suptitle("ECG Signal random padding", fontsize=18)
 n = 0
-for i in random.sample(range(6480), 40):
+
+for i in random.sample(range(6480), 60):
     ax = plt.subplot(8, 8, n+1)
     plt.plot(npx[i])
     ax.set_title(str(npy[i]))
