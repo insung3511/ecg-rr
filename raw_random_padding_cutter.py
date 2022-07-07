@@ -11,14 +11,14 @@ import wfdb
 
 PICKLE_PATH = "./pickle_rand/"
 DEFAULT_PATH = "./data/"
-DB_PATH = ['mit']
+DB_PATH = ["mit"]
 EXTRA_NP = np.array(0)
 
-NORAML_ANN = ['N', 'L', 'R', 'e', 'j']
-SUPRA_ANN = ['A', 'a', 'J', 'S']
-VENTRI_ANN = ['V', 'E']
-FUSION_ANN = ['F']
-UNCLASS_ANN = ['/', 'f', 'Q']
+NORAML_ANN = ["N", "L", "R", "e", "j"]
+SUPRA_ANN = ["A", "a", "J", "S"]
+VENTRI_ANN = ["V", "E"]
+FUSION_ANN = ["F"]
+UNCLASS_ANN = ["/", "f", "Q"]
 
 np.random.seed(42)
 
@@ -37,11 +37,11 @@ for k in range(len(DB_PATH)):
     windowed_list = []
     record_list = []
     record_ann = []
-    longest = 0.
+    longest = 0.0
 
     # Read RECORDS txt file
     print("[INFO] Read records file from ", R_PATH)
-    with open(R_PATH + 'RECORDS') as f:
+    with open(R_PATH + "RECORDS") as f:
         record_lines = f.readlines()
 
     # Read Records
@@ -60,11 +60,10 @@ for k in range(len(DB_PATH)):
         record_sg, _ = wfdb.rdsamp(temp_rpath, channels=[0], sampfrom=0)
 
         # Got R-R Peak by rdann funciton
-        record_ann = list(wfdb.rdann(temp_rpath, 'atr', sampfrom=0).sample)[1:]
-        record_ann_sym = list(wfdb.rdann(
-            temp_rpath, 'atr', sampfrom=0).symbol)[1:]
+        record_ann = list(wfdb.rdann(temp_rpath, "atr", sampfrom=0).sample)[1:]
+        record_ann_sym = list(wfdb.rdann(temp_rpath, "atr", sampfrom=0).symbol)[1:]
 
-        interval = wp.ann2rr(temp_rpath, 'atr', as_array=True)
+        interval = wp.ann2rr(temp_rpath, "atr", as_array=True)
 
         for i in range(len(record_ann)):
             # Arrythmia Annotation
@@ -118,16 +117,20 @@ for k in range(len(DB_PATH)):
                 if random_post_add > 428:
                     random_post_add = 427 - random_post_add
 
-                windowed_list = np.append([0.0], np.pad(
-                    windowed_list, (random_pre_add, random_post_add), 'constant', constant_values=0))
+                windowed_list = np.append(
+                    [0.0],
+                    np.pad(
+                        windowed_list,
+                        (random_pre_add, random_post_add),
+                        "constant",
+                        constant_values=0,
+                    ),
+                )
 
             zero_padded_list.append(windowed_list[:428])
             dict_ann.append(record_ann_sym[i])
 
-        ann_dict = {
-            0: zero_padded_list,
-            1: dict_ann
-        }
+        ann_dict = {0: zero_padded_list, 1: dict_ann}
 
         with open(temp_pickle, "wb") as f:
             pickle.dump(ann_dict, f)
