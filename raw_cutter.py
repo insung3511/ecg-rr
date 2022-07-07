@@ -66,10 +66,6 @@ for k in range(len(DB_PATH)):
             except IndexError:
                 pre_add = record_ann[i - 1]
                 post_add = record_ann[-1]
-
-            avg_div = (interval[i - 1] + interval[i]) / 2 
-            cut_pre_add = record_ann[i] - int((record_ann[i] - pre_add) / 2)
-            cut_post_add = record_ann[i] + int((post_add - record_ann[i]) / 2) 
             
             check_ann = record_ann_sym[i]
             if check_ann in NORAML_ANN:
@@ -85,11 +81,17 @@ for k in range(len(DB_PATH)):
             else:
                 record_ann_sym[i] = " "
             
+            avg_div = (interval[i - 1] + interval[i]) / 2 
+            cut_pre_add = record_ann[i] - int((record_ann[i] - pre_add) / 2)
+            cut_post_add = record_ann[i] + int((post_add - record_ann[i]) / 2) 
+
             windowed_list = flatter(record_sg[cut_pre_add:cut_post_add])
+            
             cut_it_off = int((428 - len(windowed_list)) / 2)
 
             if len(windowed_list) > 428: 
                 cut_it_off = 0
+                
                 cut_pre_add = record_ann[i] - int(428 / 2)
                 cut_post_add = record_ann[i] + int(428 / 2) 
                 windowed_list = flatter(record_sg[cut_pre_add:cut_post_add])
