@@ -1,6 +1,5 @@
 # Cutting as a beat that just raw signal.
 # That's it.
-
 import pickle
 import random
 
