@@ -105,19 +105,21 @@ for k in range(len(DB_PATH)):
                 cut_pre_add = record_ann[i] - int(428 / 2)
                 cut_post_add = record_ann[i] + int(428 / 2) 
                 
-                windowed_list = flatter(record_sg[cut_pre_add:cut_post_add])
+                windowed_list = np.array(flatter(record_sg[cut_pre_add:cut_post_add]))
                 
             else:
                 cut_it_off = int((428 - len(windowed_list)) / 2)
 
                 random_pre_add = np.random.randint(0, 429 - len(windowed_list))
-                random_post_add = int(random_pre_add + len(windowed_list))
+                random_post_add = 428 - (random_pre_add + len(windowed_list))
             
                 if random_post_add > 428:
                     random_post_add = 427 - random_post_add
 
                 windowed_list = np.append([0.0], np.pad(windowed_list, (random_pre_add, random_post_add) , 'constant', constant_values=0))
             
+            print(random_post_add, len(windowed_list[:428]))
+            windowed_list = np.array(windowed_list, dtype=np.float64)
             zero_padded_list.append(windowed_list[:428])
             dict_ann.append(record_ann_sym[i])
 
