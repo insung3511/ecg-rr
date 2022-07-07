@@ -1,13 +1,14 @@
 # Cutting as a beat that just raw signal.
 # That's it.
 
+import pickle
+import random
+
 import matplotlib.pyplot as plt
+import numpy as np
+import wfdb
 import wfdb.processing as wp
 from tqdm import tqdm
-import numpy as np
-import random
-import pickle
-import wfdb
 
 PICKLE_PATH = "./pickle_rand/"
 DEFAULT_PATH = "./data/"
