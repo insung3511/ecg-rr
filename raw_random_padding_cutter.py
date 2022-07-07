@@ -79,7 +79,7 @@ for k in range(len(DB_PATH)):
                 record_ann_sym[i] = "Q"
             else:
                 continue
-            
+                
             # Cutting beat part
             try:
                 pre_add = record_ann[i - 1]
