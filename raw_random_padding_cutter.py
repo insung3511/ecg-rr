@@ -220,7 +220,7 @@ for j in tqdm(range(len(Xte_N))):
     
 Xte_N = np.array(zero_padded_list)
 
-print("- "*15 + "Random Zero-padding applied" + " -" * 15)
+print("- "*17 + "Random Zero-padding applied" + " -" * 17)
 print("[SIZE]\t\tXtr_N : {}\t\t\tXte_N : {}\n\t\tYtr_N : {}\t\t\tYte_N : {}".format(Xtr_N.shape, Xte_N.shape, Ytr_N.shape, Yte_N.shape))
 print("- "*55)
 
@@ -268,7 +268,7 @@ for j in tqdm(range(len(Xte_S))):
 
     if len(windowed_list) > 428: 
         cut_it_off = 0
-        zero_padded_list.append(windowed_list)
+        zero_padded_list.append(windowed_list[:428])
         
     else:
         cut_it_off = int((428 - len(windowed_list)) / 2)
@@ -279,7 +279,7 @@ for j in tqdm(range(len(Xte_S))):
             zero_padded_list.append(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0))
 Xte_S = np.array(zero_padded_list)
         
-print("- "*15 + "Random Zero-padding applied" + " -" * 15)
+print("- "*17 + "Random Zero-padding applied" + " -" * 17)
 print("[SIZE]\t\tXtr_S : {}\t\t\tXte_S : {}\n\t\tYtr_S : {}\t\t\tYte_S : {}".format(Xtr_S.shape, Xte_S.shape, Ytr_S.shape, Yte_S.shape))
 print("- "*55)
 
@@ -327,7 +327,7 @@ for j in tqdm(range(len(Xte_V))):
 
     if len(windowed_list) > 428: 
         cut_it_off = 0
-        zero_padded_list.append(windowed_list)
+        zero_padded_list.append(windowed_list[:428])
         
     else:
         cut_it_off = int((428 - len(windowed_list)) / 2)
@@ -338,7 +338,7 @@ for j in tqdm(range(len(Xte_V))):
             zero_padded_list.append(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0))
 Xte_V = np.array(zero_padded_list)
         
-print("- "*15 + "Random Zero-padding applied" + " -" * 15)
+print("- "*17 + "Random Zero-padding applied" + " -" * 17)
 print("[SIZE]\t\tXtr_V : {}\t\t\tXte_V : {}\n\t\tYtr_V : {}\t\t\tYte_V : {}".format(Xtr_V.shape, Xte_V.shape, Ytr_V.shape, Yte_V.shape))
 print("- "*55)
 
@@ -397,7 +397,7 @@ for j in tqdm(range(len(Xte_F))):
             zero_padded_list.append(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0))
 Xte_F = np.array(zero_padded_list)
         
-print("- "*15 + "Random Zero-padding applied" + " -" * 15)
+print("- "*17 + "Random Zero-padding applied" + " -" * 17)
 print("[SIZE]\t\tXtr_F : {}\t\t\tXte_F : {}\n\t\tYtr_F : {}\t\t\tYte_F : {}".format(Xtr_F.shape, Xte_F.shape, Ytr_F.shape, Yte_F.shape))
 print("- "*55)
 
@@ -456,6 +456,6 @@ for j in tqdm(range(len(Xte_Q))):
             zero_padded_list.append(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0))
 Xte_Q = np.array(zero_padded_list)
         
-print("- "*15 + "Random Zero-padding applied" + " -" * 15)
+print("- "*17 + "Random Zero-padding applied" + " -" * 17)
 print("[SIZE]\t\tXtr_Q : {}\t\t\tXte_Q : {}\n\t\tYtr_Q : {}\t\t\tYte_Q : {}".format(Xtr_Q.shape, Xte_Q.shape, Ytr_Q.shape, Yte_Q.shape))
 print("- "*55)
