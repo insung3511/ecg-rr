@@ -60,7 +60,6 @@ for j in tqdm(range(len(record_list))):
     # Got R-R Peak by rdann funciton
     record_ann = list(wfdb.rdann(temp_rpath, 'atr', sampfrom=0).sample)[1:]
     record_ann_sym = list(wfdb.rdann(temp_rpath, 'atr', sampfrom=0).symbol)[1:]
-
     interval = wp.ann2rr(temp_rpath, 'atr', as_array=True)
     
     for i in range(len(record_ann)):            
@@ -72,35 +71,40 @@ for j in tqdm(range(len(record_list))):
             post_add = record_ann[-1]
 
         check_ann = record_ann_sym[i]
+        avg_div = (interval[i - 1] + interval[i]) / 2 
         
+        cut_pre_add = record_ann[i] - int((record_ann[i] - pre_add) / 2)
+        cut_post_add = record_ann[i] + int((post_add - record_ann[i]) / 2) 
+        
+        cutted_beat = flatter(record_sg[cut_pre_add:cut_post_add])
         if check_ann in NORAML_ANN:
             record_ann_sym[i] = "N"
-            sigN.append(flatter(record_sg[pre_add:post_add]))
+            sigN.append(cutted_beat)
             annN.append(record_ann_sym[i])
 
         elif check_ann in SUPRA_ANN:
             record_ann_sym[i] = "S"
-            sigS.append(flatter(record_sg[pre_add:post_add]))
+            sigS.append(cutted_beat)
             annS.append(record_ann_sym[i])
 
         elif check_ann in VENTRI_ANN:
             record_ann_sym[i] = "V"
-            sigV.append(flatter(record_sg[pre_add:post_add]))
+            sigV.append(cutted_beat)
             annV.append(record_ann_sym[i])
 
         elif check_ann in FUSION_ANN:
             record_ann_sym[i] = "F"
-            sigF.append(flatter(record_sg[pre_add:post_add]))
+            sigF.append(cutted_beat)
             annF.append(record_ann_sym[i])
 
         elif check_ann in UNCLASS_ANN:
             record_ann_sym[i] = "Q"
-            sigQ.append(flatter(record_sg[pre_add:post_add]))
+            sigQ.append(cutted_beat)
             annQ.append(record_ann_sym[i])
 
         else:
             continue
-    
+        
     dict_ann.append(record_ann_sym[i])
 
 sigN_np = np.array(sigN)
@@ -160,6 +164,7 @@ print("- "*35)
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # Random zero-padding part
+# Normal beat
 R_PATH = DEFAULT_PATH + DB_PATH[0] + "/"
 
 dict_ann = []
@@ -191,10 +196,6 @@ for j in tqdm(range(len(Xtr_N))):
     
     windowed_list = np.array(windowed_list, dtype=np.float64)
     zero_padded_list.append(windowed_list[:428])
-    
-    plt.plot(zero_padded_list[-1])
-    plt.show()
-    
 Xtr_N = np.array(zero_padded_list)
 
 dict_ann = []
@@ -203,6 +204,66 @@ zero_padded_list = []
 for j in tqdm(range(len(Xte_N))):
     # Got R-R Peak by rdann funciton
     windowed_list = Xte_N[j]
+    cut_it_off = int((428 - len(windowed_list)) / 2)
+
+    if len(windowed_list) > 428: 
+        cut_it_off = 0
+        zero_padded_list.append(windowed_list[:428])
+        
+    else:
+        cut_it_off = int((428 - len(windowed_list)) / 2)
+
+        if len(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0)) == 427:
+            zero_padded_list.append(np.append([0.0], np.pad(windowed_list, cut_it_off , 'constant', constant_values=0)))
+        else:
+            zero_padded_list.append(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0))
+    
+Xte_N = np.array(zero_padded_list)
+
+print("- "*15 + "Random Zero-padding applied" + " -" * 15)
+print("[SIZE]\t\tXtr_N : {}\t\t\tXte_N : {}\n\t\tYtr_N : {}\t\t\tYte_N : {}".format(Xtr_N.shape, Xte_N.shape, Ytr_N.shape, Yte_N.shape))
+print("- "*55)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# Random zero-padding part
+# Supra-Ventricular beat
+dict_ann = []
+windowed_list = []
+zero_padded_list = []
+for j in tqdm(range(len(Xtr_S))):
+    temp_rpath = R_PATH + str(j)
+    temp_pickle = PICKLE_PATH + DB_PATH[0] + str(j) + ".pkl"
+
+    windowed_list = Xtr_S[j]
+    cut_it_off = int((428 - len(windowed_list)) / 2)
+
+    if np.sum(windowed_list) == 0:
+        continue
+
+    if len(windowed_list) > 428: 
+        cut_it_off = 0            
+        
+    else:
+        cut_it_off = int((428 - len(windowed_list)) / 2)
+
+        random_pre_add = np.random.randint(0, 429 - len(windowed_list))
+        random_post_add = 428 - (random_pre_add + len(windowed_list))
+    
+        if random_post_add > 428:
+            random_post_add = 427 - random_post_add
+
+        windowed_list = np.append([0.0], np.pad(windowed_list, (random_pre_add, random_post_add) , 'constant', constant_values=0))
+    
+    windowed_list = np.array(windowed_list, dtype=np.float64)
+    zero_padded_list.append(windowed_list[:428])
+Xtr_S = np.array(zero_padded_list)
+
+dict_ann = []
+windowed_list = []
+zero_padded_list = []
+for j in tqdm(range(len(Xte_S))):
+    # Got R-R Peak by rdann funciton
+    windowed_list = Xte_S[j]
     cut_it_off = int((428 - len(windowed_list)) / 2)
 
     if len(windowed_list) > 428: 
@@ -216,11 +277,185 @@ for j in tqdm(range(len(Xte_N))):
             zero_padded_list.append(np.append([0.0], np.pad(windowed_list, cut_it_off , 'constant', constant_values=0)))
         else:
             zero_padded_list.append(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0))
+Xte_S = np.array(zero_padded_list)
         
-    plt.plot(zero_padded_list[-1])
-    plt.show()
-        
-
 print("- "*15 + "Random Zero-padding applied" + " -" * 15)
-print("[SIZE]\t\tXtr_N : {}\t\t\tXte_N : {}\n\t\tYtr_N : {}\t\t\tYte_N : {}".format(Xtr_N.shape, Xte_N.shape, Ytr_N.shape, Yte_N.shape))
+print("[SIZE]\t\tXtr_S : {}\t\t\tXte_S : {}\n\t\tYtr_S : {}\t\t\tYte_S : {}".format(Xtr_S.shape, Xte_S.shape, Ytr_S.shape, Yte_S.shape))
+print("- "*55)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# Random zero-padding part
+# Ventricular beat
+dict_ann = []
+windowed_list = []
+zero_padded_list = []
+for j in tqdm(range(len(Xtr_V))):
+    temp_rpath = R_PATH + str(j)
+    temp_pickle = PICKLE_PATH + DB_PATH[0] + str(j) + ".pkl"
+
+    windowed_list = Xtr_V[j]
+    cut_it_off = int((428 - len(windowed_list)) / 2)
+
+    if np.sum(windowed_list) == 0:
+        continue
+
+    if len(windowed_list) > 428: 
+        cut_it_off = 0            
+        
+    else:
+        cut_it_off = int((428 - len(windowed_list)) / 2)
+
+        random_pre_add = np.random.randint(0, 429 - len(windowed_list))
+        random_post_add = 428 - (random_pre_add + len(windowed_list))
+    
+        if random_post_add > 428:
+            random_post_add = 427 - random_post_add
+
+        windowed_list = np.append([0.0], np.pad(windowed_list, (random_pre_add, random_post_add) , 'constant', constant_values=0))
+    
+    windowed_list = np.array(windowed_list, dtype=np.float64)
+    zero_padded_list.append(windowed_list[:428])
+Xtr_V = np.array(zero_padded_list)
+
+dict_ann = []
+windowed_list = []
+zero_padded_list = []
+for j in tqdm(range(len(Xte_V))):
+    # Got R-R Peak by rdann funciton
+    windowed_list = Xte_V[j]
+    cut_it_off = int((428 - len(windowed_list)) / 2)
+
+    if len(windowed_list) > 428: 
+        cut_it_off = 0
+        zero_padded_list.append(windowed_list)
+        
+    else:
+        cut_it_off = int((428 - len(windowed_list)) / 2)
+
+        if len(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0)) == 427:
+            zero_padded_list.append(np.append([0.0], np.pad(windowed_list, cut_it_off , 'constant', constant_values=0)))
+        else:
+            zero_padded_list.append(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0))
+Xte_V = np.array(zero_padded_list)
+        
+print("- "*15 + "Random Zero-padding applied" + " -" * 15)
+print("[SIZE]\t\tXtr_V : {}\t\t\tXte_V : {}\n\t\tYtr_V : {}\t\t\tYte_V : {}".format(Xtr_V.shape, Xte_V.shape, Ytr_V.shape, Yte_V.shape))
+print("- "*55)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# Random zero-padding part
+# False beat
+dict_ann = []
+windowed_list = []
+zero_padded_list = []
+for j in tqdm(range(len(Xtr_F))):
+    temp_rpath = R_PATH + str(j)
+    temp_pickle = PICKLE_PATH + DB_PATH[0] + str(j) + ".pkl"
+
+    windowed_list = Xtr_F[j]
+    cut_it_off = int((428 - len(windowed_list)) / 2)
+
+    if np.sum(windowed_list) == 0:
+        continue
+
+    if len(windowed_list) > 428: 
+        cut_it_off = 0            
+        
+    else:
+        cut_it_off = int((428 - len(windowed_list)) / 2)
+
+        random_pre_add = np.random.randint(0, 429 - len(windowed_list))
+        random_post_add = 428 - (random_pre_add + len(windowed_list))
+    
+        if random_post_add > 428:
+            random_post_add = 427 - random_post_add
+
+        windowed_list = np.append([0.0], np.pad(windowed_list, (random_pre_add, random_post_add) , 'constant', constant_values=0))
+    
+    windowed_list = np.array(windowed_list, dtype=np.float64)
+    zero_padded_list.append(windowed_list[:428])
+Xtr_F = np.array(zero_padded_list)
+
+dict_ann = []
+windowed_list = []
+zero_padded_list = []
+for j in tqdm(range(len(Xte_F))):
+    # Got R-R Peak by rdann funciton
+    windowed_list = Xte_F[j]
+    cut_it_off = int((428 - len(windowed_list)) / 2)
+
+    if len(windowed_list) > 428: 
+        cut_it_off = 0
+        zero_padded_list.append(windowed_list)
+        
+    else:
+        cut_it_off = int((428 - len(windowed_list)) / 2)
+
+        if len(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0)) == 427:
+            zero_padded_list.append(np.append([0.0], np.pad(windowed_list, cut_it_off , 'constant', constant_values=0)))
+        else:
+            zero_padded_list.append(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0))
+Xte_F = np.array(zero_padded_list)
+        
+print("- "*15 + "Random Zero-padding applied" + " -" * 15)
+print("[SIZE]\t\tXtr_F : {}\t\t\tXte_F : {}\n\t\tYtr_F : {}\t\t\tYte_F : {}".format(Xtr_F.shape, Xte_F.shape, Ytr_F.shape, Yte_F.shape))
+print("- "*55)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# Random zero-padding part
+# Unclassed beat
+dict_ann = []
+windowed_list = []
+zero_padded_list = []
+for j in tqdm(range(len(Xtr_Q))):
+    temp_rpath = R_PATH + str(j)
+    temp_pickle = PICKLE_PATH + DB_PATH[0] + str(j) + ".pkl"
+
+    windowed_list = Xtr_Q[j]
+    cut_it_off = int((428 - len(windowed_list)) / 2)
+
+    if np.sum(windowed_list) == 0:
+        continue
+
+    if len(windowed_list) > 428: 
+        cut_it_off = 0            
+        
+    else:
+        cut_it_off = int((428 - len(windowed_list)) / 2)
+
+        random_pre_add = np.random.randint(0, 429 - len(windowed_list))
+        random_post_add = 428 - (random_pre_add + len(windowed_list))
+    
+        if random_post_add > 428:
+            random_post_add = 427 - random_post_add
+
+        windowed_list = np.append([0.0], np.pad(windowed_list, (random_pre_add, random_post_add) , 'constant', constant_values=0))
+    
+    windowed_list = np.array(windowed_list, dtype=np.float64)
+    zero_padded_list.append(windowed_list[:428])
+Xtr_Q = np.array(zero_padded_list)
+
+dict_ann = []
+windowed_list = []
+zero_padded_list = []
+for j in tqdm(range(len(Xte_Q))):
+    # Got R-R Peak by rdann funciton
+    windowed_list = Xte_Q[j]
+    cut_it_off = int((428 - len(windowed_list)) / 2)
+
+    if len(windowed_list) > 428: 
+        cut_it_off = 0
+        zero_padded_list.append(windowed_list)
+        
+    else:
+        cut_it_off = int((428 - len(windowed_list)) / 2)
+
+        if len(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0)) == 427:
+            zero_padded_list.append(np.append([0.0], np.pad(windowed_list, cut_it_off , 'constant', constant_values=0)))
+        else:
+            zero_padded_list.append(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0))
+Xte_Q = np.array(zero_padded_list)
+        
+print("- "*15 + "Random Zero-padding applied" + " -" * 15)
+print("[SIZE]\t\tXtr_Q : {}\t\t\tXte_Q : {}\n\t\tYtr_Q : {}\t\t\tYte_Q : {}".format(Xtr_Q.shape, Xte_Q.shape, Ytr_Q.shape, Yte_Q.shape))
 print("- "*55)
