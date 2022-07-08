@@ -23,11 +23,24 @@ VENTRI_ANN = ['V', 'E']
 FUSION_ANN = ['F']
 UNCLASS_ANN = ['/', 'f', 'Q']
 
-np.random.seed(42)
+np.random.seed(64)
 
 def flatter(list_of_list):
     flatList = [ item for elem in list_of_list for item in elem]
     return flatList
+
+def randomPlotter(title, x, y):
+    plt.figure(figsize=(30, 12))
+    plt.suptitle(title, fontsize=18)
+    n = 0
+
+    for i in random.sample(range(len(x)), 60):
+        ax = plt.subplot(8, 8, n+1)
+        plt.plot(x[i])
+        ax.set_title(str(y[i]))
+        n+=1
+    plt.show()
+    plt.clf()
 
 def TrainSetPadding(Xarray, Yarray):
     Xreturn, yreturn = [], []
@@ -49,8 +62,7 @@ def TrainSetPadding(Xarray, Yarray):
             Xreturn.append(
                 np.append([0.0], np.pad(beat_list, (random_front_add, random_back_add), 'constant', constant_values=0))[:428]
             )
-        plt.plot(Xreturn[-1])   
-        plt.show()
+
     return np.array(Xreturn), np.array(yreturn)
 
 def TestSetPadding(Xarray, Yarray):
@@ -189,7 +201,6 @@ annQ_ran = random.sample(annQ, 7000)
 sigQ_np = np.array(sigQ_ran)
 annQ_np = np.array(annQ_ran)
 
-random.seed(42)
 sigF_ran = []
 annF_ran = []
 for sig in range(7000):
@@ -217,27 +228,48 @@ Xtr_Q, Xte_Q, Ytr_Q, Yte_Q = train_test_split(sigQ_np, annQ_np, test_size=0.3, r
 
 print("- "*35)
 
+print("[SIZE]\t\tXtr_N : {}\t\tXte_N : {}\n\t\tYtr_N : {}\t\t\tYte_N : {}".format(Xtr_N.shape, Xte_N.shape, Ytr_N.shape, Yte_N.shape))
+print("- "*35)
+
+print("[SIZE]\t\tXtr_S : {}\t\tXte_S : {}\n\t\tYtr_S : {}\t\t\tYte_S : {}".format(Xtr_S.shape, Xte_S.shape, Ytr_S.shape, Yte_S.shape))
+print("- "*35)
+
+print("[SIZE]\t\tXtr_V : {}\t\tXte_V : {}\n\t\tYtr_V : {}\t\t\tYte_V : {}".format(Xtr_V.shape, Xte_V.shape, Ytr_V.shape, Yte_V.shape))
+print("- "*35)
+
+print("[SIZE]\t\tXtr_F : {}\t\tXte_F : {}\n\t\tYtr_F : {}\t\t\tYte_F : {}".format(Xtr_F.shape, Xte_F.shape, Ytr_F.shape, Yte_F.shape))
+print("- "*35)
+
+print("[SIZE]\t\tXtr_Q : {}\t\tXte_Q : {}\n\t\tYtr_Q : {}\t\t\tYte_Q : {}".format(Xtr_Q.shape, Xte_Q.shape, Ytr_Q.shape, Yte_Q.shape))
+print("- "*35)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# Random zero-padding part
+# Normal beat
+R_PATH = DEFAULT_PATH + DB_PATH[0] + "/"
+
 Xtr_N, Ytr_N = TrainSetPadding(Xtr_N, Ytr_N)
 Xte_N, Yte_N = TestSetPadding(Xte_N, Yte_N)
 print("[SIZE]\t\tXtr_N : {}\t\tXte_N : {}\n\t\tYtr_N : {}\t\t\tYte_N : {}".format(Xtr_N.shape, Xte_N.shape, Ytr_N.shape, Yte_N.shape))
-print("- "*35)
 
 Xtr_S, Ytr_S = TrainSetPadding(Xtr_S, Ytr_S)
 Xte_S, Yte_S = TestSetPadding(Xte_S, Yte_S)
 print("[SIZE]\t\tXtr_S : {}\t\tXte_S : {}\n\t\tYtr_S : {}\t\t\tYte_S : {}".format(Xtr_S.shape, Xte_S.shape, Ytr_S.shape, Yte_S.shape))
-print("- "*35)
 
 Xtr_V, Ytr_V = TrainSetPadding(Xtr_V, Ytr_V)
 Xte_V, Yte_V = TestSetPadding(Xte_V, Yte_V)
 print("[SIZE]\t\tXtr_V : {}\t\tXte_V : {}\n\t\tYtr_V : {}\t\t\tYte_V : {}".format(Xtr_V.shape, Xte_V.shape, Ytr_V.shape, Yte_V.shape))
-print("- "*35)
 
 Xtr_F, Ytr_F = TrainSetPadding(Xtr_F, Ytr_F)
 Xte_F, Yte_F = TestSetPadding(Xte_F, Yte_F)
 print("[SIZE]\t\tXtr_F : {}\t\tXte_F : {}\n\t\tYtr_F : {}\t\t\tYte_F : {}".format(Xtr_F.shape, Xte_F.shape, Ytr_F.shape, Yte_F.shape))
-print("- "*35)
 
 Xtr_Q, Ytr_Q = TrainSetPadding(Xtr_Q, Ytr_Q)
 Xte_Q, Yte_Q = TestSetPadding(Xte_Q, Yte_Q)
 print("[SIZE]\t\tXtr_Q : {}\t\tXte_Q : {}\n\t\tYtr_Q : {}\t\t\tYte_Q : {}".format(Xtr_Q.shape, Xte_Q.shape, Ytr_Q.shape, Yte_Q.shape))
-print("- "*35)
+
+randomPlotter("Normal - Train set", Xtr_N, Ytr_N)
+randomPlotter("Supra  - Train set", Xtr_S, Ytr_S)
+randomPlotter("Ventri - Train set", Xtr_V, Ytr_V)
+randomPlotter("False  - Train set", Xtr_F, Ytr_F)
+randomPlotter("Nah    - Train set", Xtr_Q, Ytr_Q)
