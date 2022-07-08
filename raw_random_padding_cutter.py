@@ -25,6 +25,16 @@ UNCLASS_ANN = ['/', 'f', 'Q']
 
 np.random.seed(42)
 
+def zero_sum(x_array, y_array):
+    x_return_array, y_return_array = [], []
+    for i in range(len(x_array)):
+        if np.sum(x_array[i]) == 0:
+            continue
+        else:
+            x_return_array.append(x_array[i])
+            y_return_array.append(y_array[i])
+    return x_return_array, y_return_array
+
 def flatter(list_of_list):
     flatList = [ item for elem in list_of_list for item in elem]
     return flatList
@@ -49,7 +59,7 @@ def TrainSetPadding(Xarray, Yarray):
             Xreturn.append(
                 np.append([0.0], np.pad(beat_list, (random_front_add, random_back_add), 'constant', constant_values=0))[:428]
             )
-            
+
     return np.array(Xreturn), np.array(yreturn)
 
 def TestSetPadding(Xarray, Yarray):
@@ -155,6 +165,12 @@ for j in tqdm(range(len(record_list))):
             continue
         
     dict_ann.append(record_ann_sym[i])
+
+sigN, annN = zero_sum(sigN, annN)
+sigS, annS = zero_sum(sigS, annS)
+sigV, annV = zero_sum(sigV, annV)
+sigF, annF = zero_sum(sigF, annF)
+sigQ, annQ = zero_sum(sigQ, annQ)
 
 sigN_np = np.array(sigN)
 annN_np = np.array(annN)
