@@ -12,7 +12,7 @@ import numpy as np
 import random
 import wfdb
 
-PICKLE_PATH = "./pickle_rand/"
+PICKLE_PATH = "./pickle_mat/"
 DEFAULT_PATH = "./data/"
 DB_PATH = ['mit']
 EXTRA_NP = np.array(0)
@@ -49,8 +49,7 @@ def TrainSetPadding(Xarray, Yarray):
             Xreturn.append(
                 np.append([0.0], np.pad(beat_list, (random_front_add, random_back_add), 'constant', constant_values=0))[:428]
             )
-        plt.plot(Xreturn[-1])   
-        plt.show()
+            
     return np.array(Xreturn), np.array(yreturn)
 
 def TestSetPadding(Xarray, Yarray):
@@ -102,7 +101,7 @@ print("[INFO] Read RECORDS that what it read it")
 for i in range(len(record_lines)):
     record_list.append(str(record_lines[i].strip()))
 
-print("[INFO] Starting Cutting beat and make it delicious pickle")
+print("[INFO] Starting Cutting beat and make it shuffle as casino")
 for j in tqdm(range(len(record_list))):
     temp_rpath = R_PATH + record_list[j]
     record_sg, _ = wfdb.rdsamp(temp_rpath, channels=[0], sampfrom=0)
