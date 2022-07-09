@@ -1,6 +1,7 @@
 # Cutting as a beat that just raw signal.
 # That's it.
 
+from operator import concat
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.utils import to_categorical
 from sklearn.preprocessing import LabelEncoder
@@ -59,7 +60,7 @@ def TrainSetPadding(Xarray, Yarray):
             Xreturn.append(
                 np.append([0.0], np.pad(beat_list, (random_front_add, random_back_add), 'constant', constant_values=0))[:428]
             )
-
+        
     return np.array(Xreturn), np.array(yreturn)
 
 def TestSetPadding(Xarray, Yarray):
@@ -85,6 +86,18 @@ def TestSetPadding(Xarray, Yarray):
             else:
                 Xreturn.append(np.pad(beat_list, cutting_off, 'constant', constant_values=0)[:428])
     return np.array(Xreturn), np.array(yreturn)    
+
+def concater(noraml, supra, ventri, fusion, q):
+    concate_list = []
+    concate_list.append(noraml)
+    concate_list.append(supra)
+    concate_list.append(ventri)
+    concate_list.append(fusion)
+    concate_list.append(q)
+    
+    concate_list = np.array(random.shuffle(flatter(concate_list)))
+    print("= = = = = = = = %" + str(concate_list.shape))
+    return concate_list
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - 
 # Read only beats
@@ -136,27 +149,28 @@ for j in tqdm(range(len(record_list))):
         cut_post_add = record_ann[i] + int((post_add - record_ann[i]) / 2) 
         
         cutted_beat = flatter(record_sg[cut_pre_add:cut_post_add])
-        if check_ann in NORAML_ANN:
+
+        if check_ann in NORAML_ANN:         # Normal
             record_ann_sym[i] = "N"
             sigN.append(cutted_beat)
             annN.append(record_ann_sym[i])
 
-        elif check_ann in SUPRA_ANN:
+        elif check_ann in SUPRA_ANN:        # Supra-Ventricular
             record_ann_sym[i] = "S"
             sigS.append(cutted_beat)
             annS.append(record_ann_sym[i])
 
-        elif check_ann in VENTRI_ANN:
+        elif check_ann in VENTRI_ANN:       # Ventricular
             record_ann_sym[i] = "V"
             sigV.append(cutted_beat)
             annV.append(record_ann_sym[i])
 
-        elif check_ann in FUSION_ANN:
+        elif check_ann in FUSION_ANN:       # Fusion
             record_ann_sym[i] = "F"
             sigF.append(cutted_beat)
             annF.append(record_ann_sym[i])
 
-        elif check_ann in UNCLASS_ANN:
+        elif check_ann in UNCLASS_ANN:      # Unknown
             record_ann_sym[i] = "Q"
             sigQ.append(cutted_beat)
             annQ.append(record_ann_sym[i])
@@ -185,50 +199,60 @@ sigF_np = np.array(sigF)
 annF_np = np.array(annF)
 
 sigQ_np = np.array(sigQ)
-annQ_np = np.array(sigQ)
-
-print("[SIZE]\t\tsigN : {}\t\tannN : {}".format(sigN_np.shape, annN_np.shape))
-
-sigN_ran = random.sample(sigN, 7000)
-annN_ran = random.sample(annN, 7000)
-sigN_np = np.array(sigN_ran)
-annN_np = np.array(annN_ran)
-
-sigV_ran = random.sample(sigV, 7000)
-annV_ran = random.sample(annV, 7000)
-sigV_np = np.array(sigV_ran)
-annV_np = np.array(annV_ran)
-
-sigQ_ran = random.sample(sigQ, 7000)
-annQ_ran = random.sample(annQ, 7000)
-sigQ_np = np.array(sigQ_ran)
-annQ_np = np.array(annQ_ran)
-
-random.seed(42)
-sigF_ran = []
-annF_ran = []
-for sig in range(7000):
-    sigF_ran.append(random.choice(sigF))
-    annF_ran.append(random.choice(annF))
-
-sigF_np = np.array(sigF_ran)
-annF_np = np.array(annF_ran)
-
-# - - - - - - - - - - - - - - - - - - - - -
-sigS_ran = []
-annS_ran = []
-for sig in range(7000):
-    sigS_ran.append(random.choice(sigS))
-    annS_ran.append(random.choice(annS))
-
-sigS_np = np.array(sigS_ran)
-annS_np = np.array(annS_ran)
+annQ_np = np.array(annQ)
 
 Xtr_N, Xte_N, Ytr_N, Yte_N = train_test_split(sigN_np, annN_np, test_size=0.3, random_state=42, shuffle=True)
 Xtr_S, Xte_S, Ytr_S, Yte_S = train_test_split(sigS_np, annS_np, test_size=0.3, random_state=42, shuffle=True)
 Xtr_V, Xte_V, Ytr_V, Yte_V = train_test_split(sigV_np, annV_np, test_size=0.3, random_state=42, shuffle=True)
 Xtr_F, Xte_F, Ytr_F, Yte_F = train_test_split(sigF_np, annF_np, test_size=0.3, random_state=42, shuffle=True)
 Xtr_Q, Xte_Q, Ytr_Q, Yte_Q = train_test_split(sigQ_np, annQ_np, test_size=0.3, random_state=42, shuffle=True)
+
+random.seed(42)
+
+# Sorted for the get sample
+# Without sorting, got a error that didn't sort.
+sigN_ran = random.sample(sorted(Xtr_N), 7000)
+annN_ran = random.sample(sorted(Ytr_N), 7000)
+Xtr_N = np.array(sigN_ran)
+Ytr_N = np.array(annN_ran)
+
+# - - - - - - - - - - - - - - - - - - - - -
+sigV_ran = []
+annV_ran = []
+for sig in range(7000):
+    sigV_ran.append(random.choice(Xtr_V))
+    annV_ran.append(random.choice(Ytr_V))
+Xtr_V = np.array(sigV_ran)
+Ytr_V = np.array(annV_ran)
+
+# - - - - - - - - - - - - - - - - - - - - -
+sigS_ran = []
+annS_ran = []
+for sig in range(7000):
+    sigS_ran.append(random.choice(Xtr_S))
+    annS_ran.append(random.choice(Ytr_S))
+Xtr_S = np.array(sigS_ran)
+Ytr_S = np.array(annS_ran)
+
+# - - - - - - - - - - - - - - - - - - - - -
+sigF_ran = []
+annF_ran = []
+for sig in range(7000):
+    sigF_ran.append(random.choice(Xtr_F))
+    annF_ran.append(random.choice(Ytr_F))
+Xtr_F = np.array(sigF_ran)
+Ytr_F = np.array(annF_ran)
+
+# - - - - - - - - - - - - - - - - - - - - -
+sigQ_ran = []
+annQ_ran = []
+for sig in range(7000):
+    sigQ_ran.append(random.choice(Xtr_Q))
+    annQ_ran.append(random.choice(Ytr_Q))
+Xtr_Q = np.array(sigQ_ran)
+Ytr_Q = np.array(annQ_ran)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 print("- "*35)
 
@@ -255,4 +279,12 @@ print("- "*35)
 Xtr_Q, Ytr_Q = TrainSetPadding(Xtr_Q, Ytr_Q)
 Xte_Q, Yte_Q = TestSetPadding(Xte_Q, Yte_Q)
 print("[SIZE]\t\tXtr_Q : {}\t\tXte_Q : {}\n\t\tYtr_Q : {}\t\t\tYte_Q : {}".format(Xtr_Q.shape, Xte_Q.shape, Ytr_Q.shape, Yte_Q.shape))
+print("- "*35 + "\n")
+
+print("- "*8 + "Final Train-Test split result " + "- "*8)
+X_train = concater(Xtr_N, Xtr_S, Xtr_V, Xtr_F, Xtr_Q)
+y_train = concater(Ytr_N, Ytr_S, Ytr_V, Ytr_F, Ytr_Q)
+X_test = concater(Xte_N, Xte_S, Xte_V, Xte_F, Xte_Q)
+y_test = concater(Yte_N, Yte_S, Yte_V, Yte_F, Yte_Q)
+print("[SIZE]\t\tX_train : {}\t\tX_test : {}\n\t\ty_train : {}\t\t\ty_test : {}".format(X_train.shape, X_test.shape, y_train.shape, y_test.shape))
 print("- "*35)
