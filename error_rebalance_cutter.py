@@ -1,4 +1,5 @@
 # Cutting as a beat that filtered by Ubin.
+from turtle import shape
 import matplotlib.pyplot as plt
 import scipy.io as io
 import numpy as np
@@ -26,7 +27,7 @@ def padding_remover(array):
     for beat_array in array:
         removed_beat_array = []
         for beat_element in beat_array:
-            if beat_element == 0 or beat_element == 4:
+            if beat_element == 0 or beat_element == 1 or beat_element == 2 or beat_element == 3 or beat_element == 4:
                 continue
 
             else:
@@ -84,6 +85,20 @@ def TestSetPadding(Xarray, Yarray):
 
 def concater(normal, supra, ventri, fusion, q):
     return list(itertools.chain(normal, supra, ventri, fusion, q))
+
+def shape_check(title, x, y):
+    plt.figure(figsize=(30, 12))
+    plt.suptitle(title, fontsize=18)
+    n = 0
+    
+    for i in random.sample(range(len(x)), 25):
+        ax = plt.subplot(5, 5, n+1)
+        plt.plot(x[i])
+        ax.set_title(str(y[i]))
+
+        n+=1
+    plt.show()
+    plt.clf()
 
 print("[INFO] Training set start to padding. **RANDOM PADDING**")
 path = './data/fix_error/Rs2Tr.mat'
@@ -199,18 +214,7 @@ y_train = np.array(concater(Ytr_N, Ytr_S, Ytr_V, Ytr_F, Ytr_Q))
 print("[SIZE]\t\tX_train : {}\t\ty_train : {}".format(X_train.shape, y_train.shape))
 print("- "*35)
 
-# 랜덤으로 뽑아서 뿌려보기
-plt.figure(figsize=(30, 12))
-plt.suptitle("Training result", fontsize=18)
-n = 0
-random.seed(11)
-for i in random.sample(range(len(X_train)), 60):
-    ax = plt.subplot(8, 8, n+1)
-    plt.plot(X_train[i])
-    ax.set_title(str(y_train[i]))
-    n+=1
-plt.show()
-plt.clf()
+shape_check("Train shape check", X_train, y_train)
 
 #
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
@@ -299,14 +303,4 @@ y_test = np.array(concater(Yte_N, Yte_S, Yte_V, Yte_F, Yte_Q))
 print("[SIZE]\t\tX_test : {}\t\ty_test : {}".format(X_test.shape, y_test.shape))
 print("- "*35)
 
-plt.figure(figsize=(30, 12))
-plt.suptitle("random pal, per PAL", fontsize=18)
-n = 0
-random.seed(11)
-for i in random.sample(range(6480), 16):
-    ax = plt.subplot(5, 5, n+1)
-    plt.plot(X_test[i])
-    ax.set_title(str(y_test[i]))
-    n+=1
-plt.show()
-plt.clf()
+shape_check("Test shape check", X_test, y_test)
