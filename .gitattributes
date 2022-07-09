@@ -9,3 +9,4 @@ data/svdb filter=lfs diff=lfs merge=lfs -text
 data/filtered filter=lfs diff=lfs merge=lfs -text
 rebalanced_pickle.pkl filter=lfs diff=lfs merge=lfs -text
 pickle_rand filter=lfs diff=lfs merge=lfs -text
+data/fix_error filter=lfs diff=lfs merge=lfs -text

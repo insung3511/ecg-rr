@@ -204,13 +204,16 @@ Xtr_V, Xte_V, Ytr_V, Yte_V = train_test_split(sigV_np, annV_np, test_size=0.3, r
 Xtr_F, Xte_F, Ytr_F, Yte_F = train_test_split(sigF_np, annF_np, test_size=0.3, random_state=42, shuffle=True)
 Xtr_Q, Xte_Q, Ytr_Q, Yte_Q = train_test_split(sigQ_np, annQ_np, test_size=0.3, random_state=42, shuffle=True)
 
-# Sorted for the get sample
-# Without sorting, got a error that didn't sort.
+# - - - - - - - - - - - - - - - - - - - - -
+# Under-sampling
+# - - - - - - - - - - - - - - - - - - - - -
 sigN_ran = random.sample(sorted(Xtr_N), 7000)
 annN_ran = random.sample(sorted(Ytr_N), 7000)
 Xtr_N = np.array(sigN_ran)
 Ytr_N = np.array(annN_ran)
 
+# - - - - - - - - - - - - - - - - - - - - -
+# Over-sampling
 # - - - - - - - - - - - - - - - - - - - - -
 sigV_ran = []
 annV_ran = []
