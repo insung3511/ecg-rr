@@ -1,6 +1,7 @@
 # Cutting as a beat that just raw signal.
 # That's it.
 
+import itertools
 from operator import concat
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.utils import to_categorical
@@ -87,17 +88,11 @@ def TestSetPadding(Xarray, Yarray):
                 Xreturn.append(np.pad(beat_list, cutting_off, 'constant', constant_values=0)[:428])
     return np.array(Xreturn), np.array(yreturn)    
 
-def concater(noraml, supra, ventri, fusion, q):
-    concate_list = []
-    concate_list.append(noraml)
-    concate_list.append(supra)
-    concate_list.append(ventri)
-    concate_list.append(fusion)
-    concate_list.append(q)
-    
-    concate_list = np.array(random.shuffle(flatter(concate_list)))
-    print("= = = = = = = = %" + str(concate_list.shape))
-    return concate_list
+def concater(normal, supra, ventri, fusion, q):
+    # concate_list = [*noraml, *supra, *ventri, *fusion, *q]
+    # concate_list = np.array(random.shuffle(flatter(concate_list)))
+    # print("= = = = = = = = %" + str(concate_list.shape))
+    return list(itertools.chain(normal, supra, ventri, fusion, q))
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - 
 # Read only beats
@@ -186,8 +181,10 @@ sigV, annV = zero_sum(sigV, annV)
 sigF, annF = zero_sum(sigF, annF)
 sigQ, annQ = zero_sum(sigQ, annQ)
 
-sigN_np = np.array(sigN)
-annN_np = np.array(annN)
+sigN_ran = random.sample(sigN, 10000)
+annN_ran = random.sample(annN, 10000)
+sigN_np = np.array(sigN_ran)
+annN_np = np.array(annN_ran)
 
 sigS_np = np.array(sigS)
 annS_np = np.array(annS)
@@ -206,8 +203,6 @@ Xtr_S, Xte_S, Ytr_S, Yte_S = train_test_split(sigS_np, annS_np, test_size=0.3, r
 Xtr_V, Xte_V, Ytr_V, Yte_V = train_test_split(sigV_np, annV_np, test_size=0.3, random_state=42, shuffle=True)
 Xtr_F, Xte_F, Ytr_F, Yte_F = train_test_split(sigF_np, annF_np, test_size=0.3, random_state=42, shuffle=True)
 Xtr_Q, Xte_Q, Ytr_Q, Yte_Q = train_test_split(sigQ_np, annQ_np, test_size=0.3, random_state=42, shuffle=True)
-
-random.seed(42)
 
 # Sorted for the get sample
 # Without sorting, got a error that didn't sort.
@@ -281,10 +276,10 @@ Xte_Q, Yte_Q = TestSetPadding(Xte_Q, Yte_Q)
 print("[SIZE]\t\tXtr_Q : {}\t\tXte_Q : {}\n\t\tYtr_Q : {}\t\t\tYte_Q : {}".format(Xtr_Q.shape, Xte_Q.shape, Ytr_Q.shape, Yte_Q.shape))
 print("- "*35 + "\n")
 
-print("- "*8 + "Final Train-Test split result " + "- "*8)
-X_train = concater(Xtr_N, Xtr_S, Xtr_V, Xtr_F, Xtr_Q)
-y_train = concater(Ytr_N, Ytr_S, Ytr_V, Ytr_F, Ytr_Q)
-X_test = concater(Xte_N, Xte_S, Xte_V, Xte_F, Xte_Q)
-y_test = concater(Yte_N, Yte_S, Yte_V, Yte_F, Yte_Q)
-print("[SIZE]\t\tX_train : {}\t\tX_test : {}\n\t\ty_train : {}\t\t\ty_test : {}".format(X_train.shape, X_test.shape, y_train.shape, y_test.shape))
+print("- "*10 + "Final Train-Test split result " + "- "*10)
+X_train = np.array(concater(Xtr_N, Xtr_S, Xtr_V, Xtr_F, Xtr_Q))
+y_train = np.array(concater(Ytr_N, Ytr_S, Ytr_V, Ytr_F, Ytr_Q))
+X_test  = np.array(concater(Xte_N, Xte_S, Xte_V, Xte_F, Xte_Q))
+y_test  = np.array(concater(Yte_N, Yte_S, Yte_V, Yte_F, Yte_Q))
+print("[SIZE]\t\tX_train : {}\t\t\tX_test : {}\n\t\ty_train : {}\t\t\ty_test : {}".format(X_train.shape, X_test.shape, y_train.shape, y_test.shape))
 print("- "*35)
