@@ -89,9 +89,6 @@ def TestSetPadding(Xarray, Yarray):
     return np.array(Xreturn), np.array(yreturn)    
 
 def concater(normal, supra, ventri, fusion, q):
-    # concate_list = [*noraml, *supra, *ventri, *fusion, *q]
-    # concate_list = np.array(random.shuffle(flatter(concate_list)))
-    # print("= = = = = = = = %" + str(concate_list.shape))
     return list(itertools.chain(normal, supra, ventri, fusion, q))
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - 

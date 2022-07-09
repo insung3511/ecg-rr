@@ -26,14 +26,12 @@ def padding_remover(array):
     for beat_array in array:
         removed_beat_array = []
         for beat_element in beat_array:
-            if beat_element == 0:
+            if beat_element == 0 or beat_element == 4:
                 continue
 
             else:
                 removed_beat_array.append(beat_element)
 
-            if beat_element == 4:
-                print("You got a real fucked up")
         removed_array.append(removed_beat_array)
     return removed_array
 
