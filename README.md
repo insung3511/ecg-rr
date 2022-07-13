@@ -100,7 +100,10 @@ random(428 (Window size) - Beat length)
     -> Front padding length + Back padding length + Beat length = 428
 ```
 
+![랜덤으로 패딩 저장하기](./docs/fig3.jpeg)
+
 ## Code
+
 ```python 
 def TrainSetPadding(Xarray, Yarray):
     Xreturn, yreturn = [], []
