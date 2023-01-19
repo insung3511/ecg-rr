@@ -1,10 +1,18 @@
 # Cutting as a beat that just raw signal.
 # That's it.
 
+from wfdb import processing
+from wfdb import rdsamp
+from wfdb import rdann
+
+from scipy import signal
+
+import matplotlib.pyplot as plt
 import wfdb.processing as wp
 import numpy as np
 import pickle
 import wfdb
+import os
 
 PICKLE_PATH = "./pickle/"
 DEFAULT_PATH = "./data/"
@@ -16,6 +24,31 @@ SUPRA_ANN = ['A', 'a', 'J', 'S']
 VENTRI_ANN = ['V', 'E']
 FUSION_ANN = ['F']
 UNCLASS_ANN = ['/', 'f', 'Q']
+
+WINDOW_SIZE = 265
+
+class Filters():
+    def lowpass_filter(x, low, order=6, fs=360):
+        nyq = 0.5 * fs
+        normal_cutoff = low / nyq
+        b, a = signal.butter(order, normal_cutoff, btype='low')
+        filtered_x = signal.lfilter(b, a, x)
+        return filtered_x
+
+    def highpass_filter(x, high, order=6, fs=360):
+        nyq = 0.5 * fs
+        normal_cutoff = high / nyq
+        b, a = signal.butter(order, normal_cutoff, btype='high')
+        filtered_x = signal.lfilter(b, a, x)
+        return filtered_x
+
+    def bandpass_filter(x, low, high, order=6, fs=360):
+        nyq = 0.5 * fs
+        low, high = low / nyq, high / nyq
+        b, a = signal.butter(order, [low, high], btype='band')
+        filtered_x = signal.lfilter(b, a, x)
+        return filtered_x
+
 
 def flatter(list_of_list):
     flatList = [ item for elem in list_of_list for item in elem]
@@ -52,6 +85,12 @@ for k in range(len(DB_PATH)):
 
         # Read original sample by rdsamp function
         record_sg, _ = wfdb.rdsamp(temp_rpath, channels=[0], sampfrom=0)
+        record_sg = wp.normalize_bound(record_sg)
+
+        record_sg = wp.normalize_bound(record_sg)
+        record_sg = Filters.lowpass_filter(record_sg, 100)
+        record_sg = Filters.highpass_filter(record_sg, 0.1)
+        record_sg = Filters.bandpass_filter(record_sg, 59.5, 60.5)
 
         # Got R-R Peak by rdann funciton
         record_ann = list(wfdb.rdann(temp_rpath, 'atr', sampfrom=0).sample)[1:]
@@ -86,19 +125,19 @@ for k in range(len(DB_PATH)):
             cut_post_add = record_ann[i] + int((post_add - record_ann[i]) / 2) 
 
             windowed_list = flatter(record_sg[cut_pre_add:cut_post_add])
-            
-            cut_it_off = int((428 - len(windowed_list)) / 2)
 
-            if len(windowed_list) > 428: 
+            cut_it_off = int((WINDOW_SIZE - len(windowed_list)) / 2)
+
+            if len(windowed_list) > WINDOW_SIZE: 
                 cut_it_off = 0
                 
-                cut_pre_add = record_ann[i] - int(428 / 2)
-                cut_post_add = record_ann[i] + int(428 / 2) 
+                cut_pre_add = record_ann[i] - int(WINDOW_SIZE / 2)
+                cut_post_add = record_ann[i] + int(WINDOW_SIZE / 2) 
                 windowed_list = flatter(record_sg[cut_pre_add:cut_post_add])
                 zero_padded_list.append(windowed_list)
                 
             else:
-                cut_it_off = int((428 - len(windowed_list)) / 2)
+                cut_it_off = int((WINDOW_SIZE - len(windowed_list)) / 2)
 
                 if len(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0)) == 427:
                     zero_padded_list.append(np.append([0.0], np.pad(windowed_list, cut_it_off , 'constant', constant_values=0)))
@@ -106,6 +145,11 @@ for k in range(len(DB_PATH)):
                     zero_padded_list.append(np.pad(windowed_list, cut_it_off, 'constant', constant_values=0))
               
             dict_ann.append(record_ann_sym[i])
+            
+            if record_ann_sym[i] != 'N':
+                plt.plot(zero_padded_list[-1])
+                plt.title(record_ann_sym[i])
+                plt.show()
 
         ann_dict = {
             0 : zero_padded_list,
