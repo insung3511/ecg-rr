@@ -1,1 +1,5 @@
 data/DB_AHA/
+
+.DS_Store
+
+__pycache__
